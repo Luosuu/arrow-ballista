@@ -16,7 +16,8 @@
 // under the License.
 
 use ballista::prelude::*;
-use datafusion::prelude::{col, lit, ParquetReadOptions};
+// use datafusion::prelude::{col, lit, ParquetReadOptions};
+use datafusion::prelude::CsvReadOptions;
 
 /// This example demonstrates executing a simple query against an Arrow data source (Parquet) and
 /// fetching results, using the DataFrame trait
@@ -27,14 +28,13 @@ async fn main() -> Result<()> {
         .build()?;
     let ctx = BallistaContext::remote("localhost", 50050, &config).await?;
 
-    let filename = "testdata/alltypes_plain.parquet";
+    let filename = "/home/tinlou/Documents/datasets/significant_earthquakes/database.csv";
 
     // define the query using the DataFrame trait
     let df = ctx
-        .read_parquet(filename, ParquetReadOptions::default())
+        .read_csv(filename, CsvReadOptions::new())
         .await?
-        .select_columns(&["id", "bool_col", "timestamp_col"])?
-        .filter(col("id").gt(lit(1)))?;
+        .select_columns(&["Date", "Depth"])?;
 
     // print the results
     df.show().await?;
